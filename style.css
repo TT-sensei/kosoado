@@ -317,6 +317,14 @@ ruby rt { color: #7390b5; font-size: .46em; font-weight: 700; line-height: 1; }
   .practice-screen .answer-panel { min-height: 0; }
 }
 
+/* Tablet landscape: give the scene the wider side of the workspace so the
+   relationship diagram remains the main thing to look at. */
+@media (min-width: 921px) and (max-width: 1200px) {
+  .practice-layout { grid-template-columns: minmax(0, 1.5fr) minmax(285px, .6fr); }
+  .practice-screen .scene-panel.edu-card-pad { padding: 14px; }
+  .practice-screen .scene-figure { flex-basis: 300px; }
+}
+
 @media (max-width: 920px) {
   .home-layout, .detective-layout { grid-template-columns: 1fr; }
   .home-side { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
