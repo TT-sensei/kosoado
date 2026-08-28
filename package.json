@@ -1,0 +1,8 @@
+{
+  "name": "kosoado",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/validate-data.mjs"
+  }
+}
