@@ -156,6 +156,10 @@ button { -webkit-tap-highlight-color: transparent; }
 .viewpoint-icon { display: grid; place-items: center; width: 33px; height: 33px; border-radius: 10px; color: #aa7415; background: #ffefbf; font-size: 1.25rem; font-weight: 900; }
 .viewpoint-banner strong { display: block; color: #9b6810; font-size: .96rem; }
 .viewpoint-banner span { display: block; margin-top: 2px; font-size: .79rem; }
+.starter-cue { display: flex; align-items: center; gap: 11px; margin-top: 18px; padding: 10px 14px; border: 1px solid #cfe0f6; border-radius: 14px; color: #536c8d; background: #f5f9ff; }
+.starter-cue-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: #2867d8; background: #e5efff; font-size: 1rem; font-weight: 950; }
+.starter-cue strong { display: block; color: #2e5eaa; font-size: .86rem; }
+.starter-cue span:not(.starter-cue-icon) { display: block; margin-top: 2px; font-size: .76rem; }
 .practice-layout { display: grid; grid-template-columns: minmax(0, 1.27fr) minmax(330px, .73fr); gap: 20px; align-items: start; margin-top: 20px; }
 .scene-panel { overflow: hidden; border-color: #dce7f5; background: linear-gradient(155deg, #fff, #f7fbff); }
 .scene-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

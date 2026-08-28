@@ -237,14 +237,17 @@ export const SCENES = [
 
 export const SCENE_BY_ID = Object.fromEntries(SCENES.map((scene) => [scene.id, scene]));
 
-const ALL_OBJECT_TYPES = SCENES.flatMap((scene) => scene.objects.map((object) => object.type));
-const uniqueTypes = [...new Set(ALL_OBJECT_TYPES)];
+// 文章として確認済みの対象物グループ。
+// SCENESから自動で作らず、新しい対象物を追加したときに
+// 「どの文型で使ってよいか」を必ず人間が見直す形にする。
+const PORTABLE_OBJECT_TYPES = ['book', 'notebook', 'eraser', 'ball', 'card', 'bag', 'pencil'];
+const LOOKABLE_OBJECT_TYPES = ['book', 'notebook', 'blackboard', 'clock', 'tree', 'poster', 'card'];
 
 // 自由作文ではなく、ここに書かれた組み合わせだけを使う。
 export const QUESTION_TEMPLATES = {
   object: {
     show: {
-      id: 'show', allowedObjects: uniqueTypes,
+      id: 'show', allowedObjects: PORTABLE_OBJECT_TYPES,
       render: ({ questionType }) => questionType === 'interrogative' ? '（　）を見せますか。' : '（　）を見せて。'
     },
     take: {
@@ -252,7 +255,7 @@ export const QUESTION_TEMPLATES = {
       render: ({ questionType }) => questionType === 'interrogative' ? '（　）を取りますか。' : '（　）を取って。'
     },
     look: {
-      id: 'look', allowedObjects: ['book', 'notebook', 'blackboard', 'clock', 'tree', 'poster', 'card'],
+      id: 'look', allowedObjects: LOOKABLE_OBJECT_TYPES,
       render: ({ questionType }) => questionType === 'interrogative' ? '（　）を見ますか。' : '（　）を見て。'
     },
     choose: {
@@ -262,7 +265,7 @@ export const QUESTION_TEMPLATES = {
   },
   determiner: {
     show: {
-      id: 'show', allowedObjects: uniqueTypes,
+      id: 'show', allowedObjects: PORTABLE_OBJECT_TYPES,
       render: ({ noun, questionType }) => questionType === 'interrogative' ? `（　）${noun}を見せますか。` : `（　）${noun}を見せて。`
     },
     take: {
@@ -278,17 +281,17 @@ export const QUESTION_TEMPLATES = {
       render: ({ noun, questionType }) => questionType === 'interrogative' ? `（　）${noun}を読みますか。` : `（　）${noun}を読んで。`
     },
     choose: {
-      id: 'choose', allowedObjects: ['book', 'eraser', 'card', 'pencil', 'notebook'],
+      id: 'choose', allowedObjects: PORTABLE_OBJECT_TYPES,
       render: ({ noun, questionType }) => questionType === 'interrogative' ? `（　）${noun}を使いますか。` : `（　）${noun}を使って。`
     }
   },
   place: {
     wait: {
-      id: 'wait', allowedObjects: uniqueTypes,
+      id: 'wait', allowedObjects: null,
       render: ({ questionType }) => questionType === 'interrogative' ? '（　）で待ちますか。' : '（　）で待っていて。'
     },
     go: {
-      id: 'go', allowedObjects: uniqueTypes,
+      id: 'go', allowedObjects: null,
       render: ({ questionType }) => questionType === 'interrogative' ? '（　）に行きますか。' : '（　）に行って。'
     }
   }
@@ -316,9 +319,13 @@ const makeQuestion = (scene, targetKind, templateId, speakerId, listenerId, ques
   const target = sceneFocus(scene, targetKind);
   const object = scene.objects[0];
   const template = QUESTION_TEMPLATES[targetKind]?.[templateId];
-  if (!template) return null;
-  if (targetKind !== 'place' && !template.allowedObjects.includes(object.type)) return null;
+  if (!template) throw new Error(`未定義のテンプレートです: ${scene.id}/${targetKind}/${templateId}`);
+  if (targetKind !== 'place' && !template.allowedObjects.includes(object.type)) {
+    throw new Error(`互換性のないテンプレートです: ${scene.id}/${targetKind}/${templateId}/${object.type}`);
+  }
 
+  // 疑問問題は「どの距離か」ではなく「たずねる語を選べるか」を問う。
+  // そのため targetRelation は null のままにし、候補の表示は candidateCount で管理する。
   const targetRelation = questionType === 'interrogative'
     ? null
     : relationFromZone(scene, target.zone, speakerId, listenerId);
@@ -342,9 +349,12 @@ const makeQuestion = (scene, targetKind, templateId, speakerId, listenerId, ques
     sentence,
     answer,
     choices: Object.values(WORD_FORMS[targetKind]),
+    // 「ど」問題は距離を答えず、疑問語を選ぶ。画面には候補を3つ見せる。
+    answerFocus: questionType === 'interrogative' ? 'interrogativeWord' : 'deicticRelation',
     objectId: object.id,
     focusPlaceId: scene.focusPlaceId,
-    displayCount: questionType === 'interrogative' ? 3 : 1,
+    // これは「同じ問題を何回出すか」ではなく、画面に置く候補の数。
+    candidateCount: questionType === 'interrogative' ? 3 : 1,
     targetZone: target.zone,
     isViewpointChange: false,
     pairKey: null,
@@ -363,8 +373,7 @@ for (const scene of SCENES) {
     const templateId = scene.templateByKind[targetKind];
     const firstQuestion = makeQuestion(scene, targetKind, templateId, first.id, second.id, 'deictic');
     const secondQuestion = makeQuestion(scene, targetKind, templateId, second.id, first.id, 'deictic');
-    if (firstQuestion) bank.push(firstQuestion);
-    if (secondQuestion) bank.push(secondQuestion);
+    bank.push(firstQuestion, secondQuestion);
 
     // 同じ場面で話し手・聞き手を入れ替えるペアを作る。
     if (firstQuestion && secondQuestion && firstQuestion.targetRelation !== 'far' && secondQuestion.targetRelation !== 'far') {
@@ -381,7 +390,7 @@ for (const scene of SCENES) {
   for (const targetKind of ['object', 'determiner', 'place']) {
     const templateId = scene.interrogativeTemplateByKind[targetKind];
     const question = makeQuestion(scene, targetKind, templateId, first.id, second.id, 'interrogative');
-    if (question) bank.push(question);
+    bank.push(question);
   }
 }
 
@@ -398,7 +407,9 @@ const starterMatches = [
 starterMatches.forEach((parts, index) => {
   const id = makeQuestionId(...parts);
   const question = byId.get(id);
-  if (question) question.starterOrder = index + 1;
+  if (!question) throw new Error(`スターター問題が見つかりません: ${id}`);
+  if (!SCENE_BY_ID[parts[0]]?.starter) throw new Error(`スターター場面の印がありません: ${parts[0]}`);
+  question.starterOrder = index + 1;
 });
 
 export const QUESTION_BANK = bank;

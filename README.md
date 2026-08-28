@@ -18,8 +18,10 @@
 - `Scene`: 場所、人物の位置、対象物・場所の位置
 - `Question`: 話し手、聞き手、問う種類、文型、選択肢、正解
 - `targetRelation`: `speaker` / `listener` / `far`
-- 「ど」系列は `questionType: interrogative` として処理し、距離関係に含めない
+- 「ど」系列は `questionType: interrogative` として処理し、距離関係に含めない。`candidateCount: 3` は画面上の候補数であり、出題回数ではない
 - 文は確認済みのテンプレートと、対象物ごとの互換性から生成
+- `SCENES` の11場面をすべて問題バンクに使い、各場面×3種類に「通常2視点＋疑問1問」を用意
+- `starter: true` の場面だけに絞らず、入口の4問だけを固定し、その後は全問題から履歴と系列バランスで選ぶ
 
 ## 共通基盤
 

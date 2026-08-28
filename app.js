@@ -295,6 +295,15 @@ function renderPractice() {
       <span class="viewpoint-icon" aria-hidden="true">↔</span>
       <div><strong>視点チェンジ！</strong><span>同じ場面を、${escapeHtml(speaker.name)}の立場から見てみよう。</span></div>
     </div>` : '';
+  const starterCue = question.starterOrder === 3 ? `
+    <div class="starter-cue" role="status">
+      <span class="starter-cue-icon" aria-hidden="true">★</span>
+      <div><strong>場面の見方をひろげよう</strong><span>今度は、2人から遠いものに注目してみよう。</span></div>
+    </div>` : question.starterOrder === 4 ? `
+    <div class="starter-cue" role="status">
+      <span class="starter-cue-icon" aria-hidden="true">？</span>
+      <div><strong>たずねる場面も見てみよう</strong><span>いくつかのものから、たずねることばをえらぼう。</span></div>
+    </div>` : '';
 
   return `
     <section class="practice-screen" aria-labelledby="practice-title">
@@ -310,6 +319,7 @@ function renderPractice() {
         <div class="edu-progress-track"><div class="edu-progress-value" style="width:${progress}%"></div></div>
       </div>
       ${changeBanner}
+      ${starterCue}
       <div class="practice-layout">
         <article class="scene-panel edu-card edu-card-pad" aria-labelledby="scene-title">
           <div class="scene-panel-head"><div><span class="section-kicker">SCENE</span><h2 id="scene-title">${formatJapanese(scene.place)}</h2></div><span class="scene-tag">見て考える</span></div>
@@ -383,7 +393,7 @@ function renderSceneSvg(question, scene) {
   const target = question.targetKind === 'place'
     ? scene.places.find((place) => place.id === question.focusPlaceId)
     : object;
-  const showMultiple = question.questionType === 'interrogative';
+  const showMultiple = question.candidateCount > 1;
   const showMultipleObjects = showMultiple && question.targetKind !== 'place';
   const objectPositions = showMultipleObjects
     ? [{ x: 330, y: 165 }, { x: 400, y: 150 }, { x: 470, y: 165 }]
