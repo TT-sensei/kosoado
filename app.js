@@ -435,6 +435,8 @@ function renderSceneSvg(question, scene) {
       <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker>
     </defs>
     <rect class="svg-bg" x="0" y="0" width="800" height="380" rx="20"/>
+    ${scene.backgroundImage ? `<image class="svg-background-image" href="${escapeHtml(scene.backgroundImage)}" x="0" y="0" width="800" height="380" preserveAspectRatio="xMidYMid slice" aria-hidden="true"/>` : ''}
+    <rect class="svg-background-wash" x="0" y="0" width="800" height="380" rx="20"/>
     <rect class="svg-grid" x="18" y="18" width="764" height="344" rx="16"/>
     <text class="svg-place-title" x="35" y="27">${escapeHtml(scene.place)}</text>
     <line class="svg-floor" x1="28" y1="318" x2="772" y2="318"/>

@@ -35,6 +35,7 @@ for (const question of QUESTION_BANK) {
 
 for (const scene of SCENES) {
   assert.equal(scene.people.length, 2, `通常場面は2人: ${scene.id}`);
+  assert(typeof scene.backgroundImage === 'string' && scene.backgroundImage.endsWith('.webp'), `場面背景がありません: ${scene.id}`);
   assert(scene.people.some((person) => person.slot === 'A') && scene.people.some((person) => person.slot === 'B'), `人物位置が不足: ${scene.id}`);
   assert(scene.objects.length >= 1, `対象物がありません: ${scene.id}`);
   assert(scene.places.some((place) => place.id === scene.focusPlaceId), `焦点場所がありません: ${scene.id}`);

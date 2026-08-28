@@ -63,6 +63,14 @@ const makeObject = (id, type, name, reading, zone) => ({
 
 const makePlace = (id, label, zone, x) => ({ id, label, zone, x });
 
+const DAILY_BACKGROUND_BASE = 'https://tt-sensei.github.io/navi-character-/assets/web/backgrounds/daily';
+const SCENE_BACKGROUNDS = {
+  classroom: `${DAILY_BACKGROUND_BASE}/daily-classroom.webp`,
+  schoolyard: `${DAILY_BACKGROUND_BASE}/daily-schoolyard.webp`,
+  library: `${DAILY_BACKGROUND_BASE}/daily-library.webp`,
+  gymnasium: `${DAILY_BACKGROUND_BASE}/daily-gymnasium.webp`
+};
+
 // Sceneは「だれがどこにいるか」「何がどこにあるか」だけを持つ。
 // A / Bは左右の人物の位置、farは2人から離れた位置を表す。
 export const SCENES = [
@@ -70,6 +78,7 @@ export const SCENES = [
     id: 'classroom-book',
     place: '教室',
     description: '教室で、2人が本を見ています。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'riku', slot: 'A' }, { id: 'nami', slot: 'B' }],
     objects: [makeObject('book', 'book', '本', 'ほん', 'A')],
     places: [
@@ -86,6 +95,7 @@ export const SCENES = [
     id: 'desk-eraser',
     place: '教室',
     description: 'つくえの上に、消しゴムがあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'sora', slot: 'A' }, { id: 'kai', slot: 'B' }],
     objects: [makeObject('eraser', 'eraser', '消しゴム', 'けしゴム', 'B')],
     places: [
@@ -101,6 +111,7 @@ export const SCENES = [
     id: 'playground-ball',
     place: '校庭',
     description: '校庭で、ボールを使って遊んでいます。',
+    backgroundImage: SCENE_BACKGROUNDS.schoolyard,
     people: [{ id: 'tsuki', slot: 'A' }, { id: 'saku', slot: 'B' }],
     objects: [makeObject('ball', 'ball', 'ボール', 'ボール', 'A')],
     places: [
@@ -116,6 +127,7 @@ export const SCENES = [
     id: 'board-look',
     place: '教室',
     description: '黒板は、2人から離れたところにあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'riku', slot: 'A' }, { id: 'kai', slot: 'B' }],
     objects: [makeObject('blackboard', 'blackboard', '黒板', 'こくばん', 'far')],
     places: [
@@ -132,6 +144,7 @@ export const SCENES = [
     id: 'corridor-clock',
     place: 'ろうか',
     description: 'ろうかの時計を、2人が見上げています。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'nami', slot: 'A' }, { id: 'sora', slot: 'B' }],
     objects: [makeObject('clock', 'clock', '時計', 'とけい', 'far')],
     places: [
@@ -147,6 +160,7 @@ export const SCENES = [
     id: 'library-notebook',
     place: '図書室',
     description: '図書室で、ノートを読んでいます。',
+    backgroundImage: SCENE_BACKGROUNDS.library,
     people: [{ id: 'kai', slot: 'A' }, { id: 'saku', slot: 'B' }],
     objects: [makeObject('notebook', 'notebook', 'ノート', 'ノート', 'B')],
     places: [
@@ -162,6 +176,7 @@ export const SCENES = [
     id: 'art-card',
     place: '図工室',
     description: '図工室で、カードを使って作品を作っています。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'saku', slot: 'A' }, { id: 'tsuki', slot: 'B' }],
     objects: [makeObject('card', 'card', 'カード', 'カード', 'B')],
     places: [
@@ -177,6 +192,7 @@ export const SCENES = [
     id: 'classroom-bag',
     place: '教室',
     description: 'かばんが、そらの近くに置いてあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'sora', slot: 'A' }, { id: 'nami', slot: 'B' }],
     objects: [makeObject('bag', 'bag', 'かばん', 'かばん', 'A')],
     places: [
@@ -192,6 +208,7 @@ export const SCENES = [
     id: 'schoolyard-tree',
     place: '校庭',
     description: '木が、2人から離れたところに立っています。',
+    backgroundImage: SCENE_BACKGROUNDS.schoolyard,
     people: [{ id: 'tsuki', slot: 'A' }, { id: 'riku', slot: 'B' }],
     objects: [makeObject('tree', 'tree', '木', 'き', 'far')],
     places: [
@@ -207,6 +224,7 @@ export const SCENES = [
     id: 'hall-poster',
     place: 'ろうか',
     description: 'ろうかに、学校のお知らせがはってあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'riku', slot: 'A' }, { id: 'saku', slot: 'B' }],
     objects: [makeObject('poster', 'poster', 'ポスター', 'ポスター', 'B')],
     places: [
@@ -222,6 +240,7 @@ export const SCENES = [
     id: 'classroom-pencil',
     place: '教室',
     description: 'えんぴつが、なみの近くにあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
     people: [{ id: 'nami', slot: 'A' }, { id: 'kai', slot: 'B' }],
     objects: [makeObject('pencil', 'pencil', 'えんぴつ', 'えんぴつ', 'A')],
     places: [
