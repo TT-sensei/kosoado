@@ -298,9 +298,12 @@ ruby rt { color: #7390b5; font-size: .46em; font-weight: 700; line-height: 1; }
 /* Practice fits one tablet-landscape viewport. The scene figure yields
    remaining height instead of creating a second page to scroll through. */
 @media (min-width: 921px) {
+  body:has(.practice-screen),
+  .kosoado-app:has(.practice-screen) { overflow: hidden; }
   .kosoado-main:has(.practice-screen) {
     box-sizing: border-box;
     height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
     overflow: hidden;
     padding-block: 12px 16px;
   }
