@@ -322,7 +322,7 @@ function renderPractice() {
       ${starterCue}
       <div class="practice-layout">
         <article class="scene-panel edu-card edu-card-pad" aria-labelledby="scene-title">
-          <div class="scene-panel-head"><div><span class="section-kicker">SCENE</span><h2 id="scene-title">${formatJapanese(scene.place)}</h2></div><span class="scene-tag">見て考える</span></div>
+          <div class="scene-panel-head"><div class="scene-title"><span class="section-kicker">SCENE</span><h2 id="scene-title">${formatJapanese(scene.place)}</h2></div><span class="scene-tag">見て考える</span></div>
           <div class="speech-bubble" aria-label="${escapeHtml(speaker.name)}が話しています">
             <div class="speech-person"><img src="${speaker.image}" alt="${escapeHtml(speaker.alt)}"><span>${escapeHtml(speaker.name)}</span><small>● はなす人</small></div>
             <div class="speech-content"><span class="speech-label">${escapeHtml(speaker.name)}のことば</span><p>「${formatJapanese(question.sentence)}」</p></div>
@@ -412,15 +412,16 @@ function renderSceneSvg(question, scene) {
   const roleMarkup = people.map((person) => {
     const isSpeaker = person.id === question.speakerId;
     const character = NAVI[person.id];
-    const x = person.slot === 'A' ? 72 : 578;
+    const x = person.slot === 'A' ? 26 : 574;
+    const characterSize = 200;
     return `<g class="svg-person ${isSpeaker ? 'is-speaker' : 'is-listener'}">
-      <rect class="svg-role-pill" x="${x - 12}" y="34" width="164" height="31" rx="15"/>
-      <text class="svg-role-text" x="${x + 70}" y="55" text-anchor="middle">${isSpeaker ? '● はなす人' : '◎ きく人'}</text>
-      <image href="${character.image}" x="${x}" y="90" width="140" height="215" preserveAspectRatio="xMidYMax meet" aria-label="${escapeHtml(character.alt)}"/>
-      <text class="svg-name" x="${x + 70}" y="345" text-anchor="middle">${escapeHtml(character.name)}</text>
+      <rect class="svg-role-pill" x="${x - 8}" y="34" width="216" height="31" rx="15"/>
+      <text class="svg-role-text" x="${x + 100}" y="55" text-anchor="middle">${isSpeaker ? '● はなす人' : '◎ きく人'}</text>
+      <image class="svg-character-image" href="${character.image}" x="${x}" y="105" width="${characterSize}" height="${characterSize}" preserveAspectRatio="xMidYMax meet" aria-label="${escapeHtml(character.alt)}"/>
+      <text class="svg-name" x="${x + 100}" y="345" text-anchor="middle">${escapeHtml(character.name)}</text>
     </g>`;
   }).join('');
-  const sourceX = question.speakerId === people[0].id ? 210 : 590;
+  const sourceX = question.speakerId === people[0].id ? 225 : 575;
   const targetX = question.targetKind === 'place' ? target?.x || 360 : (showMultiple ? 400 : zoneX(object.zone));
   const relationLine = !showMultiple
     ? `<path class="svg-relation-line" d="M ${sourceX} 118 Q ${(sourceX + targetX) / 2} 80 ${targetX} 150" marker-end="url(#arrow)"/><text class="svg-relation-note" x="${(sourceX + targetX) / 2}" y="86" text-anchor="middle">${question.targetRelation === 'far' ? 'はなれた場所' : '近く'}</text>`
@@ -567,13 +568,25 @@ function renderResult() {
     </section>`;
 }
 
+function buildStarterSequence() {
+  const groups = new Map();
+  for (const question of STARTER_QUESTIONS) {
+    const key = question.pairKey || question.id;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(question);
+  }
+  return shuffle([...groups.values()])
+    .map((group) => group.sort((first, second) => (first.starterOrder || 0) - (second.starterOrder || 0)))
+    .flat();
+}
+
 function buildSeriesPlan() {
   const weakFirst = [...SERIES].sort((first, second) => accuracy(first) - accuracy(second));
-  return ['ko', 'so', 'a', 'do', weakFirst[0], weakFirst[1], weakFirst[2], weakFirst[3], weakFirst[0], weakFirst[1]];
+  return shuffle([...SERIES, ...SERIES, weakFirst[0], weakFirst[1]]);
 }
 
 function buildKindPlan() {
-  return ['object', 'object', 'object', 'determiner', 'place', 'determiner', 'place', 'object', 'place', 'determiner'];
+  return shuffle(['object', 'object', 'object', 'object', 'determiner', 'determiner', 'determiner', 'place', 'place', 'place']);
 }
 
 function startPractice() {
@@ -583,6 +596,7 @@ function startPractice() {
     questions: [],
     usedIds: new Set(),
     usedPairKeys: new Set(),
+    starterSequence: buildStarterSequence(),
     seriesPlan: buildSeriesPlan(),
     kindPlan: buildKindPlan(),
     cooldowns: { ko: 0, so: 0, a: 0, do: 0 },
@@ -614,7 +628,7 @@ function appendNextQuestion() {
   }
 
   if (!question && session.questions.length < STARTER_QUESTIONS.length) {
-    const starter = STARTER_QUESTIONS[session.questions.length];
+    const starter = session.starterSequence[session.questions.length];
     if (starter && !session.usedIds.has(starter.id)) question = starter;
   }
 
