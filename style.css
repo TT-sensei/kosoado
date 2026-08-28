@@ -190,6 +190,20 @@ ruby { ruby-position: over; }
 ruby rt { color: #7390b5; font-size: .46em; font-weight: 700; line-height: 1; }
 .scene-figure { overflow: hidden; display: flex; margin-top: 3px; border: 1px solid #d6e3f3; border-radius: 15px; background: #fff; }
 .scene-svg { display: block; width: 100%; height: auto; min-height: 0; }
+.scene-zoom-trigger { position: relative; width: 100%; padding: 0; color: inherit; text-align: left; cursor: zoom-in; }
+.scene-zoom-trigger:focus-visible { outline: 4px solid rgb(40 103 216 / 35%); outline-offset: -4px; }
+.scene-zoom-trigger:hover .scene-zoom-label { color: #174bb1; background: #fff; }
+.scene-zoom-label { position: absolute; right: 9px; bottom: 8px; padding: 4px 8px; border: 1px solid #d7e3f1; border-radius: 999px; color: #52739e; background: rgb(255 255 255 / 90%); font-family: var(--kosoado-readable-font); font-size: .66rem; font-weight: 850; pointer-events: none; }
+.scene-modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: clamp(10px, 3vw, 32px); background: rgb(19 39 71 / 68%); }
+.scene-modal-backdrop { position: absolute; inset: 0; }
+.scene-modal-card { position: relative; width: min(96vw, 1120px); max-height: 96vh; overflow: auto; padding: clamp(14px, 2.4vw, 26px); border: 1px solid #d7e5f5; border-radius: 22px; background: #f8fbff; box-shadow: 0 24px 70px rgb(8 31 68 / 34%); }
+.scene-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.scene-modal-head h2 { margin: 4px 0 0; color: #244a83; font-size: clamp(1.05rem, 2.3vw, 1.45rem); font-weight: 900; }
+.scene-modal-close { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; padding: 0; border: 1px solid #cddceb; border-radius: 50%; color: #375a83; background: #fff; font-size: 1.7rem; line-height: 1; }
+.scene-modal-close:hover { border-color: #7aa9ee; color: #174bb1; background: #edf5ff; }
+.scene-modal-figure { overflow: hidden; margin-top: 13px; border: 1px solid #d6e3f3; border-radius: 17px; background: #fff; }
+.scene-modal-figure .scene-svg { width: 100%; height: auto; min-height: 0; }
+.scene-modal-note { margin: 9px 3px 0; color: #637793; font-family: var(--kosoado-readable-font); font-size: .78rem; font-weight: 700; }
 .svg-bg { fill: #f9fcff; }
 .svg-background-image { opacity: .34; }
 .svg-background-wash { fill: rgb(255 255 255 / 62%); }

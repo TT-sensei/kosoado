@@ -329,7 +329,10 @@ function renderPractice() {
           </div>
           <div class="listener-note"><span class="role-symbol listener-symbol" aria-hidden="true">◎</span><span><strong>${escapeHtml(listener.name)}</strong>がきく人</span></div>
           <p class="situation-text"><span class="situation-mark" aria-hidden="true">i</span>${formatJapanese(situation)}</p>
-          <div class="scene-figure" id="scene-figure">${renderSceneSvg(question, scene)}</div>
+          <button class="scene-figure scene-zoom-trigger" id="scene-figure" data-action="open-scene" aria-label="場面の図を拡大して見る">
+            ${renderSceneSvg(question, scene)}
+            <span class="scene-zoom-label" aria-hidden="true">↗ タップで拡大</span>
+          </button>
           <p class="scene-legend"><span>● はなす人</span><span>◎ きく人</span><span>★ 対象</span></p>
         </article>
 
@@ -354,7 +357,23 @@ function renderPractice() {
           </div>
         </aside>
       </div>
+      ${session.sceneModalOpen ? renderSceneModal(question, scene) : ''}
     </section>`;
+}
+
+function renderSceneModal(question, scene) {
+  return `
+    <div class="scene-modal" role="dialog" aria-modal="true" aria-labelledby="scene-modal-title">
+      <div class="scene-modal-backdrop" data-action="close-scene" aria-hidden="true"></div>
+      <div class="scene-modal-card">
+        <div class="scene-modal-head">
+          <div><span class="section-kicker">SCENE</span><h2 id="scene-modal-title">${formatJapanese(scene.place)}の場面</h2></div>
+          <button class="scene-modal-close" data-action="close-scene" aria-label="拡大した場面を閉じる">×</button>
+        </div>
+        <div class="scene-modal-figure">${renderSceneSvg(question, scene)}</div>
+        <p class="scene-modal-note">場面を大きく見ています。人物と対象の位置をたしかめよう。</p>
+      </div>
+    </div>`;
 }
 
 function renderChoice(question, choice) {
@@ -606,6 +625,7 @@ function startPractice() {
     choiceOrder: null,
     feedback: null,
     hintOpen: false,
+    sceneModalOpen: false,
     pendingPairId: null,
     lastQuestionId: null,
     startedAt: Date.now(),
@@ -644,6 +664,7 @@ function appendNextQuestion() {
   if (question.pairKey) session.usedPairKeys.add(question.pairKey);
   session.lastQuestionId = question.id;
   session.current = question;
+  session.sceneModalOpen = false;
   session.selectedAnswer = null;
   session.choiceOrder = shuffle(question.choices);
   session.feedback = null;
@@ -813,6 +834,16 @@ root.addEventListener('click', (event) => {
   } else if (action === 'open-detective') {
     screen = 'detective';
     render();
+  } else if (action === 'open-scene') {
+    if (!session?.current) return;
+    session.sceneModalOpen = true;
+    session.focusSelector = '.scene-modal-close';
+    render();
+  } else if (action === 'close-scene') {
+    if (!session) return;
+    session.sceneModalOpen = false;
+    session.focusSelector = '[data-action="open-scene"]';
+    render();
   } else if (action === 'detective-view') {
     detectiveSpeakerId = actionTarget.dataset.speaker || 'riku';
     sounds.play('compare');
@@ -832,6 +863,13 @@ root.addEventListener('click', (event) => {
 });
 
 root.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && session?.sceneModalOpen) {
+    event.preventDefault();
+    session.sceneModalOpen = false;
+    session.focusSelector = '[data-action="open-scene"]';
+    render();
+    return;
+  }
   if (event.key === 'Enter' && event.target.matches('[data-answer]')) {
     event.preventDefault();
     answerQuestion(event.target.dataset.answer);
