@@ -1,0 +1,193 @@
+/* こそあど！ tablet-first practice UI
+   Scene stays the main learning object; answers are large and easy to tap.
+   The practice page is intentionally scrollable so nothing is trapped below the fold.
+*/
+
+body:has(.practice-screen),
+.kosoado-app:has(.practice-screen) {
+  overflow: auto;
+}
+
+.kosoado-main:has(.practice-screen) {
+  height: auto;
+  min-height: calc(100dvh - 70px);
+  overflow: visible;
+  padding-block: 14px 30px;
+}
+
+.practice-screen {
+  min-height: 0;
+}
+
+/* Tablet landscape: scene gets the larger side, answers stay beside it. */
+.practice-layout {
+  grid-template-columns: minmax(0, 1.48fr) minmax(300px, .72fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.practice-screen .scene-panel.edu-card-pad {
+  padding: 16px;
+}
+
+.practice-screen .scene-figure {
+  min-height: 340px;
+  height: clamp(340px, 48vh, 520px);
+  align-items: stretch;
+}
+
+.practice-screen .scene-figure .scene-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.practice-screen .scene-zoom-label {
+  right: 12px;
+  bottom: 10px;
+  padding: 6px 10px;
+  font-size: .72rem;
+}
+
+/* Navi remains part of the learning scene, but is easier to see. */
+.practice-screen .speech-bubble {
+  min-height: 78px;
+  padding: 10px 13px;
+}
+
+.practice-screen .speech-person {
+  flex-basis: 72px;
+}
+
+.practice-screen .speech-person img {
+  width: 56px;
+  height: 72px;
+}
+
+.practice-screen .speech-content p {
+  font-size: clamp(1.05rem, 2.15vw, 1.3rem);
+}
+
+/* Answer UI: large, calm, high-confidence tap targets. */
+.practice-screen .answer-card {
+  padding: 20px;
+}
+
+.practice-screen .question-prompt {
+  font-size: clamp(1.18rem, 2.2vw, 1.48rem);
+  line-height: 1.45;
+}
+
+.practice-screen .answer-grid.edu-answer-grid-4 {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.practice-screen .choice-card {
+  min-height: 72px;
+  font-size: clamp(1.35rem, 2.5vw, 1.65rem);
+  border-radius: 14px;
+}
+
+.practice-screen .feedback-area {
+  min-height: 0;
+}
+
+.practice-screen .next-button {
+  min-height: 54px;
+  font-size: 1rem;
+}
+
+/* Mid-size tablet landscape. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .kosoado-container {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .practice-layout {
+    grid-template-columns: minmax(0, 1.55fr) minmax(285px, .7fr);
+  }
+
+  .practice-screen .scene-figure {
+    height: clamp(330px, 50vh, 470px);
+  }
+
+  .practice-screen .scene-panel.edu-card-pad {
+    padding: 14px;
+  }
+
+  .practice-screen .answer-card {
+    padding: 16px;
+  }
+}
+
+/* Tablet portrait: scene first, then answers. Scroll is deliberate. */
+@media (max-width: 920px) {
+  .kosoado-main:has(.practice-screen) {
+    min-height: 0;
+    padding-block: 12px 34px;
+  }
+
+  .practice-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .practice-screen .scene-figure {
+    height: min(68vw, 480px);
+    min-height: 300px;
+  }
+
+  .practice-screen .answer-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, .58fr);
+    gap: 12px;
+    align-items: start;
+  }
+}
+
+/* Narrow screens: one answer column for simple reading order. */
+@media (max-width: 680px) {
+  .practice-screen .scene-figure {
+    height: min(78vw, 390px);
+    min-height: 250px;
+  }
+
+  .practice-screen .speech-person {
+    flex-basis: 62px;
+  }
+
+  .practice-screen .speech-person img {
+    width: 50px;
+    height: 66px;
+  }
+
+  .practice-screen .answer-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-screen .choice-card {
+    min-height: 68px;
+  }
+}
+
+/* Short landscape tablets still keep the scene large, while allowing page scroll. */
+@media (orientation: landscape) and (max-height: 720px) and (min-width: 768px) {
+  .kosoado-main:has(.practice-screen) {
+    padding-block: 8px 24px;
+  }
+
+  .practice-screen .scene-figure {
+    height: 330px;
+    min-height: 300px;
+  }
+
+  .practice-screen .speech-bubble {
+    min-height: 68px;
+  }
+
+  .practice-screen .speech-person img {
+    width: 50px;
+    height: 64px;
+  }
+}
