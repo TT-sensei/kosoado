@@ -2,7 +2,7 @@
 // Scene（場面の状態）と Question（視点から何を判断するか）を分け、
 // 文章は確認済みのテンプレートと対象物の組み合わせだけで作ります。
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 
 const NAVI_BASE = 'https://tt-sensei.github.io/navi-character-/assets/web/characters';
 
@@ -251,6 +251,70 @@ export const SCENES = [
     focusPlaceId: 'nami-seat',
     templateByKind: { object: 'take', determiner: 'take', place: 'wait' },
     interrogativeTemplateByKind: { object: 'choose', determiner: 'choose', place: 'go' }
+  },
+  {
+    id: 'music-gakufu',
+    place: '音楽室',
+    description: '音楽室で、2人が楽譜を見ています。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
+    people: [{ id: 'tsuki', slot: 'A' }, { id: 'riku', slot: 'B' }],
+    objects: [makeObject('gakufu', 'book', '楽譜', 'がくふ', 'B')],
+    places: [
+      makePlace('tsuki-seat', 'つきの席', 'A', 235),
+      makePlace('riku-seat', 'りくの席', 'B', 485),
+      makePlace('piano-front', 'ピアノの前', 'far', 360)
+    ],
+    focusPlaceId: 'riku-seat',
+    templateByKind: { object: 'show', determiner: 'read', place: 'wait' },
+    interrogativeTemplateByKind: { object: 'choose', determiner: 'read', place: 'go' }
+  },
+  {
+    id: 'gym-ball',
+    place: '体育館',
+    description: '体育館で、ボールを使って遊んでいます。',
+    backgroundImage: SCENE_BACKGROUNDS.gymnasium,
+    people: [{ id: 'sora', slot: 'A' }, { id: 'tsuki', slot: 'B' }],
+    objects: [makeObject('gym-ball', 'ball', 'ボール', 'ボール', 'A')],
+    places: [
+      makePlace('sora-corner', 'そらの近く', 'A', 235),
+      makePlace('tsuki-corner', 'つきの近く', 'B', 485),
+      makePlace('stage-front', 'ステージの前', 'far', 360)
+    ],
+    focusPlaceId: 'sora-corner',
+    templateByKind: { object: 'take', determiner: 'take', place: 'wait' },
+    interrogativeTemplateByKind: { object: 'choose', determiner: 'choose', place: 'go' }
+  },
+  {
+    id: 'entrance-bag',
+    place: '昇降口',
+    description: '昇降口に、かばんが置いてあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
+    people: [{ id: 'nami', slot: 'A' }, { id: 'sora', slot: 'B' }],
+    objects: [makeObject('entrance-bag', 'bag', 'かばん', 'かばん', 'B')],
+    places: [
+      makePlace('nami-getabako', 'なみの下駄箱', 'A', 235),
+      makePlace('sora-getabako', 'そらの下駄箱', 'B', 485),
+      makePlace('door-front', '扉の前', 'far', 360)
+    ],
+    focusPlaceId: 'sora-getabako',
+    templateByKind: { object: 'show', determiner: 'take', place: 'wait' },
+    interrogativeTemplateByKind: { object: 'choose', determiner: 'choose', place: 'go' }
+  },
+  {
+    id: 'health-poster',
+    place: '保健室',
+    description: '保健室の壁に、ポスターがはってあります。',
+    backgroundImage: SCENE_BACKGROUNDS.classroom,
+    people: [{ id: 'kai', slot: 'A' }, { id: 'nami', slot: 'B' }],
+    objects: [makeObject('health-poster', 'poster', 'ポスター', 'ポスター', 'far')],
+    places: [
+      makePlace('kai-side', 'かいの近く', 'A', 235),
+      makePlace('nami-side', 'なみの近く', 'B', 485),
+      makePlace('poster-front', 'ポスターの前', 'far', 360)
+    ],
+    focusPlaceId: 'poster-front',
+    templateByKind: { object: 'look', determiner: 'look', place: 'wait' },
+    interrogativeTemplateByKind: { object: 'look', determiner: 'look', place: 'go' }
   }
 ];
 

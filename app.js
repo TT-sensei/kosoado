@@ -17,6 +17,7 @@ import {
   SERIES_LABELS,
   STARTER_QUESTIONS,
   WORD_FORMS,
+  answerGroup,
   getSituation
 } from './data.js';
 
@@ -35,7 +36,7 @@ const retryWrong = new RetryWrong({ eventTarget: document });
 const scoreManager = new ScoreManager({ eventTarget: document });
 const comboManager = new ComboManager({ eventTarget: document, milestones: [3, 5, 10] });
 
-const DEFAULT_SETTINGS = { sound: true };
+const DEFAULT_SETTINGS = { sound: true, furigana: true };
 const SERIES = ['ko', 'so', 'a', 'do'];
 const KINDS = ['object', 'determiner', 'place'];
 const SESSION_TOTAL = 10;
@@ -45,16 +46,65 @@ const READING_MAP = {
   '校庭': 'こうてい',
   '図書室': 'としょしつ',
   '図工室': 'ずこうしつ',
+  '音楽室': 'おんがくしつ',
+  '体育館': 'たいいくかん',
+  '保健室': 'ほけんしつ',
+  '昇降口': 'しょうこうぐち',
   '黒板': 'こくばん',
   '時計': 'とけい',
-  '本': 'ほん',
+  '本だな': 'ほんだな',
+  '下駄箱': 'げたばこ',
+  '入り口': 'いりぐち',
+  '楽譜': 'がくふ',
   '消しゴム': 'けしゴム',
+  '給食': 'きゅうしょく',
+  '食器': 'しょっき',
+  '道具': 'どうぐ',
+  '体温計': 'たいおんけい',
+  '救急箱': 'きゅうきゅうばこ',
+  '当番': 'とうばん',
+  '白衣': 'はくい',
+  '配膳': 'はいぜん',
+  '本': 'ほん',
   '木': 'き',
+  '窓': 'まど',
+  '壁': 'かべ',
+  '扉': 'とびら',
   '場所': 'ばしょ',
   '近く': 'ちかく',
+  '遠い': 'とおい',
   '対象': 'たいしょう',
   '先生': 'せんせい',
-  '席': 'せき'
+  '席': 'せき',
+  '場面': 'ばめん',
+  '距離': 'きょり',
+  '関係': 'かんけい',
+  '視点': 'してん',
+  '立場': 'たちば',
+  '記号': 'きごう',
+  '矢印': 'やじるし',
+  '言葉': 'ことば',
+  '答え': 'こたえ',
+  '質問': 'しつもん',
+  '問題': 'もんだい',
+  '正解': 'せいかい',
+  '説明': 'せつめい',
+  '内容': 'ないよう',
+  '観察': 'かんさつ',
+  '発見': 'はっけん',
+  '挑戦': 'ちょうせん',
+  '結果': 'けっか',
+  '記録': 'きろく',
+  '練習': 'れんしゅう',
+  '卒業': 'そつぎょう',
+  '連続': 'れんぞく',
+  '苦手': 'にがて',
+  '学校': 'がっこう',
+  '自分': 'じぶん',
+  '相手': 'あいて',
+  '友達': 'ともだち',
+  '地図': 'ちず',
+  '全部': 'ぜんぶ'
 };
 
 function bucket() {
@@ -65,6 +115,7 @@ function defaultStats() {
   return {
     schemaVersion: 1,
     answers: 0,
+    graduated: 0,
     ko: bucket(),
     so: bucket(),
     a: bucket(),
@@ -79,6 +130,7 @@ function normalizeStats(raw) {
   const result = defaultStats();
   if (!raw || typeof raw !== 'object') return result;
   result.answers = Number(raw.answers) || 0;
+  result.graduated = Number(raw.graduated) || 0;
   for (const key of [...SERIES, ...KINDS]) {
     result[key] = { ...result[key], ...(raw[key] || {}) };
     result[key].total = Number(result[key].total) || 0;
@@ -150,6 +202,7 @@ function escapeHtml(value) {
 
 function formatJapanese(value) {
   let result = escapeHtml(value);
+  if (!state.settings.furigana) return result;
   Object.entries(READING_MAP)
     .sort(([first], [second]) => second.length - first.length)
     .forEach(([word, reading]) => {
@@ -200,6 +253,9 @@ function renderShell(content, options = {}) {
           <button class="sound-toggle" data-action="toggle-sound" aria-pressed="${state.settings.sound}" title="音の設定">
             <span aria-hidden="true">${state.settings.sound ? '🔊' : '🔇'}</span>${soundLabel}
           </button>
+          <button class="sound-toggle furigana-toggle" data-action="toggle-furigana" aria-pressed="${state.settings.furigana}" title="ふりがなの設定">
+            <span aria-hidden="true">あ</span>${state.settings.furigana ? 'ふりがな あり' : 'ふりがな なし'}
+          </button>
         </div>
       </header>
       <main class="edu-main kosoado-main" id="main">
@@ -244,7 +300,7 @@ function renderHome() {
       <div class="home-intro edu-card edu-card-pad">
         <div class="eyebrow"><span class="eyebrow-dot"></span>ことばの探検</div>
         <h1 id="home-title">こそあど！<span>ことばの距離を見つけよう</span></h1>
-        <p class="home-lead">場面を見て、だれから見たことばかを考えよう。<br>「これ？」「それ？」と、すぐに答えてみよう！</p>
+        <p class="home-lead">${formatJapanese('場面を見て、だれから見たことばかを考えよう。')}<br>「これ？」「それ？」と、すぐに答えてみよう！</p>
         <div class="home-actions">
           <button class="edu-btn edu-btn-primary edu-btn-block edu-kinetic-button start-button" data-action="start-practice">
             <span class="button-icon" aria-hidden="true">▶</span><span>れんしゅうをはじめる</span>
@@ -268,6 +324,7 @@ function renderHome() {
           <div class="mini-stat-grid">
             ${SERIES.map((key) => `<div class="mini-stat"><span>「${SERIES_LABELS[key]}」</span><strong>${accuracyText(key)}</strong></div>`).join('')}
           </div>
+          <div class="home-stat-row"><strong>${state.stats.graduated || 0}</strong><span>問を卒業（まちがえた問題に2回つづけて正解）</span></div>
           <p class="review-note ${reviewCount ? 'has-review' : ''}"><span aria-hidden="true">${reviewCount ? '↻' : '✓'}</span>${reviewCount ? `少し後で、${reviewCount}問がもう一度出ます。` : (recent ? '今日も学びを続けよう。' : 'まずは1問、見てみよう。')}</p>
         </section>
       </aside>
@@ -398,10 +455,25 @@ function renderFeedback(feedback, speaker, question) {
           : '2人から遠いところだね。';
     return `<div class="feedback-message feedback-success edu-status edu-status-success"><span class="edu-correct-mark" aria-hidden="true">○</span><div><strong>そう！ ${formatJapanese(relationText)}</strong><span>${feedback.combo > 1 ? `${feedback.combo}問れんぞく正解！` : 'つぎの場面へ進もう。'}</span></div></div><button class="edu-btn edu-btn-primary next-button" data-action="next-question">つぎへ <span aria-hidden="true">→</span></button>`;
   }
-  const hint = question.questionType === 'interrogative'
-    ? 'ものや場所が、いくつあるかな？'
-    : 'だれの近くかな？ ★をもう一度見てみよう。';
-  return `<div class="feedback-message feedback-retry edu-status edu-status-warning"><span class="edu-wrong-mark" aria-hidden="true">×</span><div><strong>もう一度、場面を見てみよう。</strong><span>${formatJapanese(hint)}</span></div></div><button class="edu-btn edu-btn-secondary next-button" data-action="next-question">つぎの場面へ <span aria-hidden="true">→</span></button>`;
+  const answer = question.answer;
+  const reasonText = question.questionType === 'interrogative'
+    ? 'ものや場所が分からないから、たずねる「ど」のことばだよ。'
+    : question.targetRelation === 'speaker'
+      ? `★は、はなす人の${speaker.name}の近くにあるよ。だから「こ」のことばだね。`
+      : question.targetRelation === 'listener'
+        ? `★は、きく人の${NAVI[question.listenerId].name}の近くにあるよ。だから「そ」のことばだね。`
+        : '★は、2人から遠いところにあるよ。だから「あ」のことばだね。';
+  const selected = feedback.selected;
+  let chosenText = '';
+  if (selected && selected !== answer) {
+    if (question.questionType !== 'interrogative' && answerGroup(selected) === question.series) {
+      chosenText = `「${selected}」は近さの考え方は合っているけど、この文では「${answer}」の形が合うよ。`;
+    } else {
+      const meaning = { ko: 'はなす人の近く', so: 'きく人の近く', a: '2人から遠いところ', do: 'たずねるとき' }[answerGroup(selected)];
+      if (meaning) chosenText = `「${selected}」は、${meaning}を言うことばだよ。`;
+    }
+  }
+  return `<div class="feedback-message feedback-retry edu-status edu-status-warning"><span class="edu-wrong-mark" aria-hidden="true">×</span><div><strong>おしい！ こたえは「${answer}」。</strong><span>${formatJapanese(reasonText)}</span>${chosenText ? `<span>${formatJapanese(chosenText)}</span>` : ''}</div></div><button class="edu-btn edu-btn-secondary next-button" data-action="next-question">つぎの場面へ <span aria-hidden="true">→</span></button>`;
 }
 
 function renderSceneSvg(question, scene) {
@@ -537,7 +609,7 @@ function renderDetective() {
   return `
     <section class="detective-screen" aria-labelledby="detective-title">
       <div class="screen-back"><button class="edu-btn edu-btn-secondary" data-action="home">← ホームへ</button></div>
-      <div class="detective-heading"><span class="section-kicker">ことば探偵</span><h1 id="detective-title">同じ本でも、ことばが変わる？</h1><p>はなす人を入れかえて、場面の見え方をくらべてみよう。</p></div>
+      <div class="detective-heading"><span class="section-kicker">ことば探偵</span><h1 id="detective-title">同じ本でも、ことばが変わる？</h1><p>${formatJapanese('はなす人を入れかえて、場面の見え方をくらべてみよう。')}</p></div>
       <div class="detective-layout">
         <article class="detective-demo edu-card edu-card-pad">
           <div class="scene-panel-head"><div><span class="section-kicker">同じ場面</span><h2>教室の本</h2></div><span class="scene-tag">視点を入れかえる</span></div>
@@ -552,12 +624,12 @@ function renderDetective() {
         </article>
         <aside class="detective-guide">
           <div class="detective-rule edu-card edu-card-pad"><div class="section-kicker">ことばの地図</div><h2>だれから見た？</h2><div class="rule-list">
-            <div class="rule-item ko"><b>これ・この・ここ</b><span>はなす人の近く</span></div>
-            <div class="rule-item so"><b>それ・その・そこ</b><span>きく人の近く</span></div>
-            <div class="rule-item a"><b>あれ・あの・あそこ</b><span>2人から遠い</span></div>
+            <div class="rule-item ko"><b>これ・この・ここ</b><span>${formatJapanese('はなす人の近く')}</span></div>
+            <div class="rule-item so"><b>それ・その・そこ</b><span>${formatJapanese('きく人の近く')}</span></div>
+            <div class="rule-item a"><b>あれ・あの・あそこ</b><span>${formatJapanese('2人から遠い')}</span></div>
             <div class="rule-item do"><b>どれ・どの・どこ</b><span>たずねるとき</span></div>
           </div></div>
-          <div class="detective-tip edu-status edu-status-info"><span class="tip-icon" aria-hidden="true">✦</span><div><strong>こつ</strong><span>まず「はなす人」を見つけよう。そこから近さを考えると分かりやすいよ。</span></div></div>
+          <div class="detective-tip edu-status edu-status-info"><span class="tip-icon" aria-hidden="true">✦</span><div><strong>こつ</strong><span>${formatJapanese('まず「はなす人」を見つけよう。そこから近さを考えると分かりやすいよ。')}</span></div></div>
         </aside>
       </div>
       <div class="detective-start"><button class="edu-btn edu-btn-primary" data-action="start-practice">分かった！ れんしゅうへ →</button></div>
@@ -582,7 +654,8 @@ function renderResult() {
         <div class="result-stat edu-stat edu-stat-success"><span class="edu-stat-label">今回の正答率</span><strong class="edu-stat-value">${result.accuracy}<small>%</small></strong><span class="edu-stat-note">見つけた関係</span></div>
         <div class="result-stat edu-stat"><span class="edu-stat-label">もう一度出る問題</span><strong class="edu-stat-value">${state.reviewQueue.length}<small>問</small></strong><span class="edu-stat-note">少し時間をあけて復習</span></div>
       </div>
-      <div class="result-message edu-status edu-status-info"><span class="tip-icon" aria-hidden="true">🔎</span><div><strong>${weakSeriesLabel} × ${weakKindLabel}</strong><span>この組み合わせを、別の場面でもう少し見てみよう。</span></div></div>
+      <div class="result-message edu-status edu-status-info"><span class="tip-icon" aria-hidden="true">🔎</span><div><strong>${weakSeriesLabel} × ${weakKindLabel}</strong><span>${formatJapanese('この組み合わせを、別の場面でもう少し見てみよう。')}</span></div></div>
+      <div class="result-message edu-status edu-status-success"><span class="tip-icon" aria-hidden="true">🎓</span><div><strong>${formatJapanese(`卒業した問題 ${state.stats.graduated || 0}問`)}</strong><span>${formatJapanese('間違えた問題に、時間をおいて2回つづけて正解すると卒業だよ。')}</span></div></div>
       <div class="result-actions"><button class="edu-btn edu-btn-primary" data-action="restart-practice">もう10問</button><button class="edu-btn edu-btn-secondary" data-action="home">ホームへ</button></div>
     </section>`;
 }
@@ -732,7 +805,10 @@ function recordAnswer(question, isCorrect) {
   if (isCorrect) {
     if (existing) {
       existing.streak = (existing.streak || 0) + 1;
-      if (existing.streak >= 2) state.reviewQueue = state.reviewQueue.filter((item) => item.questionId !== question.id);
+      if (existing.streak >= 2) {
+        state.reviewQueue = state.reviewQueue.filter((item) => item.questionId !== question.id);
+        state.stats.graduated = (state.stats.graduated || 0) + 1;
+      }
       else existing.availableAfter = state.stats.answers + 2;
     }
   } else if (existing) {
@@ -762,7 +838,7 @@ function answerQuestion(answer) {
     sounds.play('softFail');
   }
   recordAnswer(question, isCorrect);
-  session.feedback = { isCorrect, combo, correct: question.answer };
+  session.feedback = { isCorrect, combo, correct: question.answer, selected: answer };
   session.focusSelector = '[data-action="next-question"]';
   render();
   requestAnimationFrame(() => {
@@ -853,6 +929,10 @@ root.addEventListener('click', (event) => {
     state.settings.sound = !state.settings.sound;
     persistState();
     if (state.settings.sound) sounds.play('soundOn');
+    render();
+  } else if (action === 'toggle-furigana') {
+    state.settings.furigana = !state.settings.furigana;
+    persistState();
     render();
   } else if (action === 'toggle-hint') {
     if (!session || session.feedback) return;
