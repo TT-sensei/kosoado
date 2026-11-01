@@ -487,7 +487,7 @@ function renderSceneSvg(question, scene) {
   const showMultiple = question.candidateCount > 1;
   const showMultipleObjects = showMultiple && question.targetKind !== 'place';
   const objectPositions = showMultipleObjects
-    ? [{ x: 330, y: 165 }, { x: 400, y: 150 }, { x: 470, y: 165 }]
+    ? scene.places.map((place) => ({ x: place.x, y: 158 }))
     : [{ x: zoneX(object.zone), y: 165 }];
   const spotMarkup = scene.places.map((place) => {
     const active = !showMultiple && question.targetKind === 'place' && place.id === target?.id;
@@ -509,10 +509,11 @@ function renderSceneSvg(question, scene) {
       <rect class="svg-role-pill" x="${x - 8}" y="34" width="216" height="31" rx="15"/>
       <text class="svg-role-text" x="${x + 100}" y="55" text-anchor="middle">${isSpeaker ? '● はなす人' : '◎ きく人'}</text>
       <image class="svg-character-image" href="${character.image}" x="${x}" y="105" width="${characterSize}" height="${characterSize}" preserveAspectRatio="xMidYMax meet" aria-label="${escapeHtml(character.alt)}"/>
-      <text class="svg-name" x="${x + 100}" y="345" text-anchor="middle">${escapeHtml(character.name)}</text>
+      <text class="svg-name" x="${x + 100}" y="326" text-anchor="middle">${escapeHtml(character.name)}</text>
     </g>`;
   }).join('');
-  const sourceX = question.speakerId === people[0].id ? 225 : 575;
+  const personX = (id) => (people.find((person) => person.id === id)?.slot === 'A' ? 225 : 575);
+  const sourceX = question.targetRelation === 'listener' ? personX(question.listenerId) : personX(question.speakerId);
   const targetX = question.targetKind === 'place' ? target?.x || 360 : (showMultiple ? 400 : zoneX(object.zone));
   const relationLine = !showMultiple
     ? `<path class="svg-relation-line" d="M ${sourceX} 118 Q ${(sourceX + targetX) / 2} 80 ${targetX} 150" marker-end="url(#arrow)"/><text class="svg-relation-note" x="${(sourceX + targetX) / 2}" y="86" text-anchor="middle">${question.targetRelation === 'far' ? 'はなれた場所' : '近く'}</text>`
@@ -531,7 +532,7 @@ function renderSceneSvg(question, scene) {
     <rect class="svg-background-wash" x="0" y="0" width="800" height="380" rx="20"/>
     <rect class="svg-grid" x="18" y="18" width="764" height="344" rx="16"/>
     <text class="svg-place-title" x="35" y="27">${escapeHtml(scene.place)}</text>
-    <line class="svg-floor" x1="28" y1="318" x2="772" y2="318"/>
+    <line class="svg-floor" x1="28" y1="340" x2="772" y2="340"/>
     ${spotMarkup}
     ${objectMarkup}
     ${relationLine}
